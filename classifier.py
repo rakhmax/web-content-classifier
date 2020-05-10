@@ -7,7 +7,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import ComplementNB
 from sklearn.neighbors import KNeighborsClassifier
 from vars import Paths
-import time
 
 
 def prepare_categories_dataset():
