@@ -66,7 +66,6 @@ def save_best_model(clfs):
 
 
 if __name__ == '__main__':
-    s_time = time.time()
     classifiers = [
         ('RandomForest', RandomForestClassifier()),
         ('KNeighbors', KNeighborsClassifier()),
@@ -74,4 +73,3 @@ if __name__ == '__main__':
     ]
     prepare_categories_dataset()
     save_best_model(classifiers)
-    print(time.time() - s_time)
