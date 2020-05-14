@@ -60,8 +60,11 @@ def save_best_model(clfs):
         print(classification_report(y_test, pred))
 
         if accuracy > init_accuracy:
-            pickle.dump(clf, open(Paths.MODEL.value, 'wb'))
+            best_clf = clf
             init_accuracy = accuracy
+
+    pickle.dump(best_clf, open(Paths.MODEL.value, 'wb'))
+    print('Best classifier is', best_clf)
 
 
 if __name__ == '__main__':

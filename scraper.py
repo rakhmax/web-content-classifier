@@ -26,7 +26,7 @@ def scrap_urls(urls):
             print(e)
 
         try:
-            soup = BeautifulSoup(html_code, 'html5lib')
+            soup = BeautifulSoup(html_code, 'lxml')
             [s.extract() for s in soup('script')]
             [s.extract() for s in soup('style')]
             title = soup.title(text=True)[0]
