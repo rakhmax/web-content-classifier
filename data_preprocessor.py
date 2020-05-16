@@ -1,4 +1,5 @@
 import json
+import time
 from pathlib import Path
 import pandas as pd
 from vars import Paths
@@ -14,7 +15,12 @@ def preprocess():
         categories = []
 
         for category in data:
-            categories.append([category, 1, 1, 1, 1])
+            if category == 'Adult':
+                categories.append([category, 1, 0, 0, 0])
+            elif category == 'Games' or category == 'Recreation' or category == 'Shopping':
+                categories.append([category, 1, 1, 0, 0])
+            else:
+                categories.append([category, 1, 1, 1, 0])
 
             for url in data[category]:
                 urls.append([url, category])
@@ -25,12 +31,12 @@ def preprocess():
     pd.DataFrame(categories).to_csv(
         Paths.CATEGORIES.value, header=header, index=False)
 
-    header = ['content', 'category']
+    header = ['url', 'content', 'category']
     pd.DataFrame(scrap_urls(urls)).to_csv(
         Paths.URLS.value, header=header, index=False)
 
-    print('Data has been preprocessed')
-
 
 if __name__ == '__main__':
+    tic = time.perf_counter()
     preprocess()
+    print(f'Preprocessed in {round(time.perf_counter() - tic, 1)} seconds')

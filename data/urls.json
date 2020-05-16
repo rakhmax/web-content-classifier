@@ -27,11 +27,9 @@
       "https://kanobu.ru/",
       "http://www.gamer.ru/",
       "https://www.goha.ru/",
-      "https://vgtimes.ru/"
+      "https://vgtimes.ru/",
+      "http://www.fatalgame.com/"
     ],
-    "Health": [],
-    "Home": [],
-    "Kids": [],
     "News": [
       "https://lenta.ru/",
       "https://ria.ru/",
@@ -56,23 +54,33 @@
       "https://www.amediateka.ru/",
       "https://rserial.com/"
     ],
-    "Science": [],
+    "Science": [
+      "https://nplus1.ru/news/2020/05/15/giant-atoms-waveguide",
+      "https://nplus1.ru/news/2020/05/16/quasars-and-black-holes",
+      "https://nplus1.ru/news/2020/05/15/locomotor-asymmetries",
+      "https://elementy.ru/novosti_nauki/433649/Vulkanicheskikh_vybrosov_SO_2_v_kontse_triasa_bylo_dostatochno_dlya_rezkogo_potepleniya",
+      "https://elementy.ru/novosti_nauki/433650/Otkrytie_dvukh_vysokobaricheskikh_soedineniy_vody_s_kremnezemom_prolivaet_svet_na_geologiyu_superzemel",
+      "https://postnauka.ru/faq/44957",
+      "https://indicator.ru/engineering-science/3d-pechat-samoletov-raket-usovershenstvovali-15-05-2020.htm",
+      "https://indicator.ru/earth-science/kamchatke-vulkanicheskikh-gazov-minerala-15-05-2020.htm",
+      "https://nplus1.ru/news/2020/05/08/synthetic-chloroplast",
+      "https://nplus1.ru/news/2020/05/08/gender-robots"
+    ],
     "Shopping": [
       "https://store.steampowered.com/",
       "https://www2.hm.com/ru_ru/index.html",
       "https://www.beru.ru/",
-      "https://www.mvideo.ru/",
+      "https://www.holodilnik.ru/",
       "https://www.reserved.com/ru/ru/woman",
       "https://www.wildberries.ru/",
       "https://www.citilink.ru/",
       "https://www.ozon.ru/",
       "https://www.lamoda.ru/",
-      "https://www.onlinetrade.ru/",
       "https://www.utkonos.ru/"
     ],
     "Sport": [
       "https://www.sport.ru/",
-      "https://www.championat.com/",
+      "https://www.sports.ru/tennis/?from=menu",
       "https://www.bbc.com/sport",
       "https://www.espn.com/",
       "https://www.sports.ru/",

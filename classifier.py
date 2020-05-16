@@ -1,10 +1,12 @@
 import pickle
+import time
 import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 from sklearn.model_selection import train_test_split
-from sklearn.naive_bayes import ComplementNB
+from sklearn.naive_bayes import ComplementNB, MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier
 from vars import Paths
 
@@ -21,21 +23,19 @@ def prepare_categories_dataset():
         clf = ComplementNB()
         clf.fit(x, y[user])
         pred = clf.predict(x)
-        print(clf.predict(x))
-        print(accuracy_score(y[user], pred))
 
 
-def prepare_urls_dataset():
+def split_dataset():
     df = pd.read_csv(Paths.URLS.value, na_filter=False)
     x, y = df.content, df.category
 
-    tfidf = TfidfVectorizer()
-    tfidf.fit(x)
-    tfidf.transform(x)
+    tfidf = TfidfVectorizer(max_features=1500, lowercase=False)
+    tfidf.fit_transform(x)
 
     pickle.dump(tfidf, open(Paths.FEATURES.value, 'wb'))
 
-    x_train, x_test, y_train, y_test = train_test_split(x, y)
+    x_train, x_test, y_train, y_test = train_test_split(
+        x, y, test_size=0.3, stratify=y)
 
     x_train_tfidf = tfidf.transform(x_train)
     x_test_tfidf = tfidf.transform(x_test)
@@ -43,9 +43,12 @@ def prepare_urls_dataset():
     return x_train_tfidf, x_test_tfidf, y_train, y_test
 
 
-def save_best_model(clfs):
-    x_train, x_test, y_train, y_test = prepare_urls_dataset()
+def train_model(clfs):
+    x_train, x_test, y_train, y_test = split_dataset()
     init_accuracy = 0
+
+    y_train.value_counts().plot(figsize=(14, 10), kind='bar', color='grey')
+    plt.savefig('trainStratify.png')
 
     for name, clf in clfs:
         clf.fit(x_train, y_train)
@@ -54,7 +57,6 @@ def save_best_model(clfs):
         accuracy = accuracy_score(y_test, pred)
 
         print(f'\n{name}:')
-        print(pred)
         print(accuracy)
         print(confusion_matrix(y_test, pred))
         print(classification_report(y_test, pred))
@@ -68,10 +70,12 @@ def save_best_model(clfs):
 
 
 if __name__ == '__main__':
+    tic = time.perf_counter()
     classifiers = [
         ('RandomForest', RandomForestClassifier()),
         ('KNeighbors', KNeighborsClassifier()),
-        ('ComplementNB', ComplementNB())
+        ('ComplementNB', ComplementNB()),
     ]
     prepare_categories_dataset()
-    save_best_model(classifiers)
+    train_model(classifiers)
+    print(f'Classified in {round(time.perf_counter() - tic, 2)} seconds')

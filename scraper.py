@@ -4,7 +4,8 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from stop_words import get_stop_words
 from nltk.tokenize import word_tokenize
-from nltk.stem import PorterStemmer
+from nltk.stem import SnowballStemmer
+import time
 
 stop_words_ru = get_stop_words('russian')
 stop_words_en = get_stop_words('english')
@@ -17,7 +18,8 @@ h.ignore_links = True
 def scrap_urls(urls):
     df = pd.DataFrame(urls)
     contents = []
-    porter = PorterStemmer()
+    stemmer_ru = SnowballStemmer('russian')
+    stemmer_en = SnowballStemmer('english')
 
     for row in df.itertuples():
         try:
@@ -37,15 +39,14 @@ def scrap_urls(urls):
 
         try:
             tokenized_title = word_tokenize(title)
-            result_title = [porter.stem(i) for i in tokenized_title
+            result_title = [stemmer_ru.stem(stemmer_en.stem(i)) for i in tokenized_title
                             if i.lower() not in stop_words
                             and i.isalpha()
                             and len(i) > 3]
 
-            text = h.handle(html_body)
-            text_from_html = text.replace('\n', ' ')
+            text_from_html = html_body.replace('\n', ' ')
             tokenized_html = word_tokenize(text_from_html)
-            result_words = [porter.stem(i) for i in tokenized_html
+            result_words = [stemmer_ru.stem(stemmer_en.stem(i)) for i in tokenized_html
                             if i.lower() not in stop_words
                             and i.isalpha()
                             and len(i) > 3]
@@ -54,9 +55,9 @@ def scrap_urls(urls):
             content = ' '.join(result_words).lower()
 
             if len(row) == 3:
-                contents.append([' '.join([row[1], title, content]), row[2]])
+                contents.append([row[1], ' '.join([title, content]), row[2]])
             else:
-                contents.append(' '.join([row[1], title, content]))
+                contents.append(' '.join([title, content]))
         except Exception as e:
             print(e)
 

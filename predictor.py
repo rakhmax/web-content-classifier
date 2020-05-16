@@ -1,5 +1,7 @@
 import pickle
-import sys
+import argparse
+import time
+from io import StringIO
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from database import cursor, conn
@@ -7,33 +9,52 @@ from vars import Paths, blacklist, whitelist, banned_categories
 from scraper import scrap_urls
 
 
-def predict(url: str, user_type):
-    blacklist = blacklist(user_type)
-    whitelist = whitelist(user_type)
-    banned_categories = banned_categories(user_type)
+def init_args():
+    parser = argparse.ArgumentParser(description=__doc__)
 
-    if url in blacklist:
+    parser.add_argument('--user', help='user category', required=True)
+    parser.add_argument('--url', help='website to analyze', required=True)
+
+    return parser.parse_args()
+
+
+def predict(user: int, url: str):
+    blist = blacklist(user)
+    wlist = whitelist(user)
+    banned = banned_categories(user)
+
+    if url in blist:
         return 'Access denied'
 
-    elif url in whitelist:
+    elif url in wlist:
         return 'Access granted'
 
-    else:
-        tfidf: TfidfVectorizer = pickle.load(open(Paths.FEATURES.value, 'rb'))
-        features = tfidf.transform(scrap_urls([url]))
+    content = scrap_urls([url])
 
-        clf = pickle.load(open(Paths.MODEL.value, 'rb'))
+    tfidf: TfidfVectorizer = pickle.load(open(Paths.FEATURES.value, 'rb'))
+    features = tfidf.transform(content)
 
-        category = clf.predict(features)[0]
+    clf = pickle.load(open(Paths.MODEL.value, 'rb'))
 
-        if category in banned_categories:
-            cursor.execute(f'''INSERT INTO blacklist VALUES (
-                {category}, {user_type}
-            )''')
-            return 'Access denied'
+    category = clf.predict(features)[0]
 
-        return clf.predict(features)
+    if category in banned:
+        cursor.execute(f'''INSERT INTO blacklist VALUES (
+            {category}, {user}
+        )''')
+        conn.commit()
+
+        return 'Access denied'
+
+    predicted = clf.predict(features)
+    pd.DataFrame([[url, *content, *predicted]]
+                 ).to_csv(Paths.URLS.value, mode='a', index=False, header=False)
+
+    return predicted
 
 
 if __name__ == '__main__':
-    print(predict(sys.argv[1], sys.argv[2]))
+    tic = time.perf_counter()
+    args = init_args()
+    print(predict(args.user, args.url))
+    print(f'Predicted in {round(time.perf_counter() - tic, 1)} seconds')
