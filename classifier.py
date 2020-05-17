@@ -2,27 +2,15 @@ import pickle
 import time
 import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.multiclass import OneVsRestClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import ComplementNB, MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.pipeline import Pipeline
 from vars import Paths
-
-
-def prepare_categories_dataset():
-    df = pd.read_csv(Paths.CATEGORIES.value, na_filter=False)
-    x, y = df.category, df[['common', 'kid', 'office', 'student']]
-
-    tfidf = TfidfVectorizer()
-    tfidf.fit(x)
-    x = tfidf.transform(x)
-
-    for user in y:
-        clf = ComplementNB()
-        clf.fit(x, y[user])
-        pred = clf.predict(x)
 
 
 def split_dataset():
@@ -76,6 +64,5 @@ if __name__ == '__main__':
         ('KNeighbors', KNeighborsClassifier()),
         ('ComplementNB', ComplementNB()),
     ]
-    prepare_categories_dataset()
     train_model(classifiers)
     print(f'Classified in {round(time.perf_counter() - tic, 2)} seconds')

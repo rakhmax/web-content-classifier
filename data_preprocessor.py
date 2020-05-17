@@ -1,5 +1,6 @@
 import json
 import time
+from os import path
 from pathlib import Path
 import pandas as pd
 from vars import Paths
@@ -7,36 +8,44 @@ from scraper import scrap_urls
 
 
 def preprocess():
-    try:
-        with open(Path('./data', 'urls.json'), 'r') as json_data:
-            data = json.load(json_data)
+    url_path = Paths.URLS.value
 
-        urls = []
-        categories = []
+    if path.isfile(url_path):
+        df = pd.read_csv(url_path).drop_duplicates(subset=['url'])
+        df.to_csv(url_path, index=False)
+    else:
+        try:
+            with open(Path('./data', 'urls.json'), 'r') as json_data:
+                data = json.load(json_data)
 
-        for category in data:
-            if category == 'Adult':
-                categories.append([category, 1, 0, 0, 0])
-            elif category == 'Games' or category == 'Recreation' or category == 'Shopping':
-                categories.append([category, 1, 1, 0, 0])
-            else:
-                categories.append([category, 1, 1, 1, 0])
+            urls = []
+            categories = []
 
-            for url in data[category]:
-                urls.append([url, category])
-    except Exception as e:
-        print(e)
+            for category in data:
+                for url in data[category]:
+                    urls.append([url, category])
 
-    header = ['category', 'common', 'kid', 'office', 'student']
-    pd.DataFrame(categories).to_csv(
-        Paths.CATEGORIES.value, header=header, index=False)
+            scrapped_urls = scrap_urls(urls)
 
-    header = ['url', 'content', 'category']
-    pd.DataFrame(scrap_urls(urls)).to_csv(
-        Paths.URLS.value, header=header, index=False)
+            labeled_urls = []
+
+            for url in scrapped_urls:
+                if url[2] == 'Adult':
+                    labeled_urls.append([*url, 1, 0, 0, 0])
+                elif url[2] == 'Games' or url[2] == 'Recreation' or url[2] == 'Shopping':
+                    labeled_urls.append([*url, 1, 1, 0, 0])
+                else:
+                    labeled_urls.append([*url, 1, 1, 1, 0])
+
+            header = ['url', 'content', 'category',
+                      'common', 'kid', 'office', 'student']
+            pd.DataFrame(labeled_urls).to_csv(
+                url_path, header=header, index=False)
+        except Exception as e:
+            print(e)
 
 
 if __name__ == '__main__':
     tic = time.perf_counter()
     preprocess()
-    print(f'Preprocessed in {round(time.perf_counter() - tic, 1)} seconds')
+    print(f'Preprocessed in {round(time.perf_counter() - tic, 2)} seconds')
