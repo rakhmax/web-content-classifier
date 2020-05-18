@@ -1,11 +1,10 @@
-import requests
-import html2text
-import pandas as pd
+import time
 from bs4 import BeautifulSoup
-from stop_words import get_stop_words
 from nltk.tokenize import word_tokenize
 from nltk.stem import SnowballStemmer
-import time
+import pandas as pd
+import requests
+from stop_words import get_stop_words
 
 
 def scrap_urls(urls):
@@ -13,13 +12,11 @@ def scrap_urls(urls):
     stop_words_en = get_stop_words('english')
     stop_words = stop_words_en + stop_words_ru
 
-    h = html2text.HTML2Text()
-    h.ignore_links = True
+    stemmer_ru = SnowballStemmer('russian')
+    stemmer_en = SnowballStemmer('english')
 
     df = pd.DataFrame(urls)
     contents = []
-    stemmer_ru = SnowballStemmer('russian')
-    stemmer_en = SnowballStemmer('english')
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36 Edg/81.0.416.72'
@@ -28,17 +25,15 @@ def scrap_urls(urls):
     for row in df.itertuples():
         try:
             response = requests.get(row[1], headers=headers)
-            http_status = response.status_code
-            html_code = response.content
         except Exception as e:
             print(e)
 
-        if http_status == 200:
+        if response.status_code == 200:
             try:
-                soup = BeautifulSoup(html_code, 'lxml')
-                [s.extract() for s in soup('noscript')]
-                [s.extract() for s in soup('script')]
-                [s.extract() for s in soup('style')]
+                soup = BeautifulSoup(response.content, 'lxml')
+                [s.decompose() for s in soup('noscript')]
+                [s.decompose() for s in soup('script')]
+                [s.decompose() for s in soup('style')]
                 title = soup.title(text=True)[0]
                 body = soup.body(text=True)
                 html_body = ' '.join(body)

@@ -3,8 +3,8 @@ import time
 from os import path
 from pathlib import Path
 import pandas as pd
-from vars import Paths
 from scraper import scrap_urls
+from vars import Paths
 
 
 def preprocess():
@@ -19,7 +19,6 @@ def preprocess():
                 data = json.load(json_data)
 
             urls = []
-            categories = []
 
             for category in data:
                 for url in data[category]:
@@ -31,14 +30,13 @@ def preprocess():
 
             for url in scrapped_urls:
                 if url[2] == 'Adult':
-                    labeled_urls.append([*url, 1, 0, 0, 0])
+                    labeled_urls.append([*url, 0, 0, 0])
                 elif url[2] == 'Games' or url[2] == 'Recreation' or url[2] == 'Shopping':
-                    labeled_urls.append([*url, 1, 1, 0, 0])
+                    labeled_urls.append([*url, 1, 0, 0])
                 else:
-                    labeled_urls.append([*url, 1, 1, 1, 0])
+                    labeled_urls.append([*url, 1, 1, 1])
 
-            header = ['url', 'content', 'category',
-                      'common', 'kid', 'office', 'student']
+            header = ['url', 'content', 'category', 'underage', 'office', 'student']
             pd.DataFrame(labeled_urls).to_csv(
                 url_path, header=header, index=False)
         except Exception as e:
