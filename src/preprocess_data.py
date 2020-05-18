@@ -3,7 +3,7 @@ import time
 from os import path
 from pathlib import Path
 import pandas as pd
-from scraper import scrap_urls
+from scraper import scrape_urls
 from vars import Paths
 
 
@@ -24,7 +24,7 @@ def preprocess():
                 for url in data[category]:
                     urls.append([url, category])
 
-            scrapped_urls = scrap_urls(urls)
+            scrapped_urls = scrape_urls(urls)
 
             labeled_urls = []
 

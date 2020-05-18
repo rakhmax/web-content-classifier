@@ -1,19 +1,22 @@
+import re
 import time
+import pandas as pd
+import requests
 from bs4 import BeautifulSoup
 from nltk.tokenize import word_tokenize
 from nltk.stem import SnowballStemmer
-import pandas as pd
-import requests
 from stop_words import get_stop_words
 
 
-def scrap_urls(urls):
+def scrape_urls(urls):
     stop_words_ru = get_stop_words('russian')
     stop_words_en = get_stop_words('english')
     stop_words = stop_words_en + stop_words_ru
 
     stemmer_ru = SnowballStemmer('russian')
     stemmer_en = SnowballStemmer('english')
+
+    pattern = re.compile("^https?://")
 
     df = pd.DataFrame(urls)
     contents = []
@@ -23,10 +26,15 @@ def scrap_urls(urls):
     }
 
     for row in df.itertuples():
+        if not pattern.match(row[1]):
+            print('URL must begin with http:// or https://')
+            continue
+
         try:
             response = requests.get(row[1], headers=headers)
         except Exception as e:
             print(e)
+            continue
 
         if response.status_code == 200:
             try:
@@ -39,6 +47,7 @@ def scrap_urls(urls):
                 html_body = ' '.join(body)
             except Exception as e:
                 print(e)
+                continue
 
             try:
                 tokenized_title = word_tokenize(title)
@@ -63,5 +72,6 @@ def scrap_urls(urls):
                     contents.append(' '.join([title, content]))
             except Exception as e:
                 print(e)
+                continue
 
     return contents

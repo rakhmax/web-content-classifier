@@ -1,4 +1,3 @@
-mkdir ./data
 mkdir ./models
 
 python3 -m venv env
