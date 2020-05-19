@@ -141,3 +141,4 @@ models/
 .vscode/
 *.csv
 *.db
+*.png

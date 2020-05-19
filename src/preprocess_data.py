@@ -31,8 +31,10 @@ def preprocess():
             for url in scrapped_urls:
                 if url[2] == 'Adult':
                     labeled_urls.append([*url, 0, 0, 0])
-                elif url[2] == 'Games' or url[2] == 'Recreation' or url[2] == 'Shopping':
+                elif url[2] == 'Games' or url[2] == 'Recreation':
                     labeled_urls.append([*url, 1, 0, 0])
+                elif url[2] == 'Shopping':
+                    labeled_urls.append([*url, 1, 1, 0])
                 else:
                     labeled_urls.append([*url, 1, 1, 1])
 

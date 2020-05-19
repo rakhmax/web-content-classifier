@@ -34,7 +34,6 @@ def scrape_urls(urls):
             response = requests.get(row[1], headers=headers)
         except Exception as e:
             print(e)
-            continue
 
         if response.status_code == 200:
             try:
