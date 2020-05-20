@@ -16,8 +16,6 @@ def scrape_urls(urls):
     stemmer_ru = SnowballStemmer('russian')
     stemmer_en = SnowballStemmer('english')
 
-    pattern = re.compile("^https?://")
-
     df = pd.DataFrame(urls)
     contents = []
 
@@ -26,7 +24,7 @@ def scrape_urls(urls):
     }
 
     for row in df.itertuples():
-        if not pattern.match(row[1]):
+        if not re.compile("^https?://").match(row[1]):
             print('URL must begin with http:// or https://')
             continue
 
@@ -71,6 +69,8 @@ def scrape_urls(urls):
                     contents.append(' '.join([title, content]))
             except Exception as e:
                 print(e)
-                continue
+        else:
+            print('Unable to reach', row[1])
+            print('HTTP code:', response.status_code)
 
     return contents

@@ -30,15 +30,16 @@ def preprocess():
 
             for url in scrapped_urls:
                 if url[2] == 'Adult':
-                    labeled_urls.append([*url, 0, 0, 0])
-                elif url[2] == 'Games' or url[2] == 'Recreation':
-                    labeled_urls.append([*url, 1, 0, 0])
+                    labeled_urls.append([*url, 0, 0, 0, 1])
+                elif url[2] == 'Games' or url[2] == 'Entertainment':
+                    labeled_urls.append([*url, 1, 0, 0, 0])
                 elif url[2] == 'Shopping':
-                    labeled_urls.append([*url, 1, 1, 0])
+                    labeled_urls.append([*url, 1, 1, 0, 0])
                 else:
-                    labeled_urls.append([*url, 1, 1, 1])
+                    labeled_urls.append([*url, 1, 1, 1, 1])
 
-            header = ['url', 'content', 'category', 'underage', 'office', 'student']
+            header = ['url', 'content', 'category',
+                      'underage', 'office', 'student', 'custom']
             pd.DataFrame(labeled_urls).to_csv(
                 url_path, header=header, index=False)
         except Exception as e:

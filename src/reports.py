@@ -1,7 +1,8 @@
-from sklearn.metrics import plot_confusion_matrix
 import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
+import seaborn as sns
+from sklearn.metrics import plot_confusion_matrix
+
 
 def save_confusion_matrix(cm, name):
     cmn = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
@@ -12,21 +13,21 @@ def save_confusion_matrix(cm, name):
 
 
 def save_bars(y, y_train, y_test, name):
-    y.value_counts().plot(figsize=(12, 7), kind='bar')
+    y.value_counts().plot(figsize=(12, 8), kind='bar')
     plt.xlabel('Категории')
     plt.ylabel('Кол-во элементов')
     plt.tight_layout()
     plt.savefig(f'all_{name}.png')
     plt.close()
 
-    y_train.value_counts().plot(figsize=(12, 7), kind='bar')
+    y_train.value_counts().plot(figsize=(12, 8), kind='bar')
     plt.xlabel('Категории')
     plt.ylabel('Кол-во элементов')
     plt.tight_layout()
     plt.savefig(f'train_{name}.png')
     plt.close()
 
-    y_test.value_counts().plot(figsize=(12, 7), kind='bar')
+    y_test.value_counts().plot(figsize=(12, 8), kind='bar')
     plt.xlabel('Категории')
     plt.ylabel('Кол-во элементов')
     plt.tight_layout()

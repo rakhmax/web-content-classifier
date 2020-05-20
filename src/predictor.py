@@ -12,42 +12,32 @@ from vars import Paths, blacklist, whitelist
 def init_args():
     parser = ArgumentParser(description=__doc__)
 
-    parser.add_argument('--user', help='user category',
-                        required=True, type=str)
     parser.add_argument('--url', help='website to analyze',
                         required=True, type=str)
+    parser.add_argument('--user', help='user category', type=str, nargs='+')
 
     return parser.parse_args()
 
 
-def is_allow(ctx, urls) -> bool:
-    # blist = blacklist(ctx)
-    # wlist = whitelist(ctx)
-
-    # if url in blist:
-    #     return False
-
-    # if url in wlist:
-    #     return True
-
-    if ctx == 'common':
+def is_allow(url, ctx=None):
+    if not ctx:
         return True
 
-    content = scrape_urls(urls)
+    content = scrape_urls([url])
 
     if content:
         cats_clf = pickle.load(open(Paths.CATEGORIES_MODEL.value, 'rb'))
         ctx_clf = pickle.load(open(Paths.CTX_MODEL.value, 'rb'))
 
-        predicted_cats = cats_clf['le'].inverse_transform(
+        predicted_cat = cats_clf['le'].inverse_transform(
             cats_clf['clf'].predict(content))
         predicted_ctx = ctx_clf['mlb'].inverse_transform(
             ctx_clf['clf'].predict(content))
 
-        is_allow = ctx in np.asarray(predicted_ctx)
+        is_allow = any(i in ctx for i in np.asarray(*predicted_ctx))
 
-        print(predicted_cats, predicted_ctx)
-        print(is_allow)
+        print ('Category:', predicted_cat)
+        print ('Context:', predicted_ctx)
 
         return is_allow
     else:
@@ -58,5 +48,5 @@ def is_allow(ctx, urls) -> bool:
 if __name__ == '__main__':
     tic = time.perf_counter()
     args = init_args()
-    is_allow(args.user, args.url)
+    print(is_allow(args.url, args.user))
     print(f'Predicted in {round(time.perf_counter() - tic, 1)} seconds')
