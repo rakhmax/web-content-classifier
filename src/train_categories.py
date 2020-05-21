@@ -4,12 +4,13 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report, accuracy_score, multilabel_confusion_matrix, confusion_matrix
+from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import ComplementNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelEncoder
+from sklearn.svm import LinearSVC
 from reports import save_confusion_matrix, save_bars
 from vars import Paths
 
@@ -45,12 +46,12 @@ def train_model(clfs):
 
         accuracy = accuracy_score(y_test, pred)
 
-        mlcm = multilabel_confusion_matrix(y_test, pred)
-
         save_confusion_matrix(confusion_matrix(y_test, pred), name)
-
-        print(accuracy)
-        print(classification_report(y_test, pred))
+        
+        print(name)
+        print('-----------------------------------------------------')
+        print(f'accuracy score: {round(accuracy, 2)}\n')
+        print(classification_report(y_test, pred, zero_division=0))
 
         if accuracy > init_accuracy:
             best_clf = {'clf': classifier, 'name': name}
@@ -64,10 +65,11 @@ def train_model(clfs):
 if __name__ == '__main__':
     tic = time.perf_counter()
     classifiers = [
-        ('RandomForest', RandomForestClassifier()),
-        ('KNeighbors', KNeighborsClassifier()),
-        ('ComplementNB', ComplementNB()),
-        ('LogisticRegression', LogisticRegression())
+        ('Random Forest', RandomForestClassifier()),
+        ('K-Nearest', KNeighborsClassifier()),
+        ('Complement Naive Bayes', ComplementNB()),
+        ('Logistic Regression', LogisticRegression()),
+        ('Linear SVC', LinearSVC()),
     ]
     train_model(classifiers)
     print(f'Trained in {round(time.perf_counter() - tic, 2)} seconds')

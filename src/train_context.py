@@ -1,5 +1,6 @@
 import pickle
 import time
+import numpy as np
 import pandas as pd
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.ensemble import RandomForestClassifier
@@ -11,6 +12,7 @@ from sklearn.naive_bayes import ComplementNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MultiLabelBinarizer, LabelEncoder
+from sklearn.svm import LinearSVC
 from reports import save_bars, save_confusion_matrix
 from vars import Paths
 
@@ -29,12 +31,9 @@ def get_data():
     x_train, x_test, y_train, y_test = train_test_split(
         x, y, test_size=0.3, stratify=y)
 
-    y_plot = pd.Series(LabelEncoder().fit_transform(
-        [''.join(map(str, yi)) for yi in y]))
-    y_train_plot = pd.Series(LabelEncoder().fit_transform(
-        [''.join(map(str, yi)) for yi in y_train]))
-    y_test_plot = pd.Series(LabelEncoder().fit_transform(
-        [''.join(map(str, yi)) for yi in y_test]))
+    y_plot = pd.Series(np.concatenate(y))
+    y_train_plot = pd.Series(np.concatenate(y_train))
+    y_test_plot = pd.Series(np.concatenate(y_test))
 
     save_bars(y_plot, y_train_plot, y_test_plot, 'context')
 
@@ -63,8 +62,10 @@ def train_model(clfs):
 
         accuracy = accuracy_score(y_test, pred)
 
-        print(accuracy)
-        print(classification_report(y_test, pred))
+        print(name)
+        print('-----------------------------------------------------')
+        print(f'accuracy score: {round(accuracy, 2)}\n')
+        print(classification_report(y_test, pred, zero_division=0))
 
         if accuracy > init_accuracy:
             best_clf = {'clf': classifier, 'name': name}
@@ -79,9 +80,10 @@ if __name__ == '__main__':
     tic = time.perf_counter()
     classifiers = [
         ('OvR Random Forest', RandomForestClassifier()),
-        ('OvR K-Neighbors', KNeighborsClassifier()),
-        ('OvR Complement Naive Buyes', ComplementNB()),
-        ('OvR Logistic Regression', LogisticRegression())
+        ('OvR K-Nearest', KNeighborsClassifier()),
+        ('OvR Complement Naive Bayes', ComplementNB()),
+        ('OvR Logistic Regression', LogisticRegression()),
+        ('OvR Linear SVC', LinearSVC())
     ]
     train_model(classifiers)
     print(f'Trained in {round(time.perf_counter() - tic, 2)} seconds')

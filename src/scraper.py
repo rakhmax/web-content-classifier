@@ -20,7 +20,7 @@ def scrape_urls(urls):
     contents = []
 
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36 Edg/81.0.416.72'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:76.0) Gecko/20100101 Firefox/76.0'
     }
 
     for row in df.itertuples():
@@ -31,7 +31,7 @@ def scrape_urls(urls):
         try:
             response = requests.get(row[1], headers=headers)
         except Exception as e:
-            print(e)
+            print(row[1], e)
 
         if response.status_code == 200:
             try:
@@ -43,7 +43,7 @@ def scrape_urls(urls):
                 body = soup.body(text=True)
                 html_body = ' '.join(body)
             except Exception as e:
-                print(e)
+                print(row[1], e)
                 continue
 
             try:
@@ -68,9 +68,8 @@ def scrape_urls(urls):
                 else:
                     contents.append(' '.join([title, content]))
             except Exception as e:
-                print(e)
+                print(row[1], e)
         else:
-            print('Unable to reach', row[1])
-            print('HTTP code:', response.status_code)
+            print(f'Unable to reach {row[1]}, {response.status_code}')
 
     return contents
