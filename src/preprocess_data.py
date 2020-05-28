@@ -15,7 +15,7 @@ def preprocess():
         df.to_csv(url_path, index=False)
     else:
         try:
-            with open(Path('./data', 'data.json'), 'r') as json_data:
+            with open(Path('./data', 'urls.json'), 'r') as json_data:
                 data = json.load(json_data)
 
             urls = []
@@ -41,7 +41,7 @@ def preprocess():
             header = ['url', 'content', 'category',
                       'underage', 'office', 'student', 'custom']
 
-            url_path = Path('./data', 'urls1.csv')
+            url_path = Path('./data', 'urls.csv')
             pd.DataFrame(labeled_urls).to_csv(
                 url_path, header=header, index=False)
         except Exception as e:

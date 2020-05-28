@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, recall_score
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import ComplementNB
 from sklearn.neighbors import KNeighborsClassifier
@@ -23,7 +23,7 @@ def get_data():
     x_train, x_test, y_train, y_test = train_test_split(
         x, y, test_size=0.3, stratify=y)
 
-    save_bars(y, y_train, y_test, 'categories')
+    # save_bars(y, y_train, y_test, 'categories')
 
     y_train_lb = le.fit_transform(y_train.values.tolist())
     y_test_lb = le.transform(y_test.values.tolist())
@@ -33,7 +33,7 @@ def get_data():
 
 def train_model(clfs):
     x_train, x_test, y_train, y_test, le = get_data()
-    init_accuracy = 0
+    init_recall = 0
 
     for name, clf in clfs:
         classifier = Pipeline([
@@ -45,6 +45,7 @@ def train_model(clfs):
         pred = classifier.predict(x_test)
 
         accuracy = accuracy_score(y_test, pred)
+        recall = recall_score(y_test, pred, average='micro')
 
         save_confusion_matrix(confusion_matrix(y_test, pred), name)
         
@@ -53,9 +54,9 @@ def train_model(clfs):
         print(f'accuracy score: {round(accuracy, 2)}\n')
         print(classification_report(y_test, pred, zero_division=0))
 
-        if accuracy > init_accuracy:
+        if recall > init_recall:
             best_clf = {'clf': classifier, 'name': name}
-            init_accuracy = accuracy
+            init_recall = recall
 
     pickle.dump({'le': le, 'clf': best_clf['clf']}, open(
         Paths.CATEGORIES_MODEL.value, 'wb'))
